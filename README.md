@@ -5,7 +5,7 @@ A computer vision project that detects whether a person is wearing a face mask u
 ## Technologies
 
 - Python
-- TensorFlow / Keras
+- torch/torchvision
 - OpenCV
 - NumPy
 - Matplotlib
