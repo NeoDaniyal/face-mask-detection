@@ -4,7 +4,7 @@ from typing import Callable, Tuple, Optional
 from PIL import Image
 import torch
 from torch.utils.data import Dataset
-from torchvision import transform
+from torchvision import transforms
 
 from config import CLASS_TO_IDX, IMAGENET_MEAN, IMAGENET_STD, IMAGE_SIZE
 
