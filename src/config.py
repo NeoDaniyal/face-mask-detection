@@ -1,10 +1,11 @@
 from pathlib import Path
 import os
 
+
 if os.path.exists("/content/drive"):
     BASE_DIR = Path("/content/drive/MyDrive/face_mask_detection/face-mask-detection")
 else:
-    BASE_DIR = Path(__file__).resolve().parent
+    BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR/"data"
 RAW_DATA_DIR = DATA_DIR/"raw"
 PROCCESSED_DATA_DIR = DATA_DIR/"processed"
