@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 
 if os.path.exists("/content/drive"):
-    BASE_DIR = Path("/content/drive/MyDrive/ML_Projects/stock_predictionV2")
+    BASE_DIR = Path("/content/drive/MyDrive/face_mask_detection")
 else:
     BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR/"data"
