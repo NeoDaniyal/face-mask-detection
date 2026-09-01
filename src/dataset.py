@@ -32,19 +32,19 @@ class MaskDataset(Dataset):
                 if p.is_file() and p.suffix.lower() in self.valid_extension:
                     self.image_paths.append(p)
                     self.labels.append(class_idx)
-        def __len__(self) -> int:
-            return len(self.image_paths)
+    def __len__(self) -> int:
+        return len(self.image_paths)
 
-        def __getitem__(self, idx:int) -> Tuple[torch.Tensor, int]:
-            img_path = self.image_paths[idx]
-            label = self.labels[idx]
+    def __getitem__(self, idx:int) -> Tuple[torch.Tensor, int]:
+        img_path = self.image_paths[idx]
+        label = self.labels[idx]
 
             # Convert to RGB to handle grayscale/RGBA images consistently
-            image = Image.open(img_path).convert("RGB")
+        image = Image.open(img_path).convert("RGB")
 
-            if self.transform is not None:
-                image = self.transform(image)
-            return image, label
+        if self.transform is not None:
+            image = self.transform(image)
+        return image, label
 
 def get_transform()-> Tuple[transforms.Compose, transforms.Compose]:
     """Reuturn Training and validation/testing transform pipelines.
