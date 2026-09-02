@@ -11,7 +11,6 @@ if DRIVE_PROJECT_ROOT.exists():
 else:
     BASE_DIR = LOCAL_PROJECT_ROOT
 
-
 DATA_DIR = BASE_DIR / "data"
 
 RAW_DATA_DIR = DATA_DIR / "raw"
