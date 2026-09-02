@@ -4,7 +4,7 @@ DRIVE_PROJECT_ROOT = Path(
     "/content/drive/MyDrive/face_mask_detection/face-mask-detection"
 )
 
-LOCAL_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+LOCAL_PROJECT_ROOT = Path(__file__).resolve().parent
 
 if DRIVE_PROJECT_ROOT.exists():
     BASE_DIR = DRIVE_PROJECT_ROOT
