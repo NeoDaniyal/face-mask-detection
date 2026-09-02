@@ -1,5 +1,5 @@
 from config import BATCH_SIZE, IDX_TO_CLASS
-from dataloader import create_dataloaders
+from src.dataloader import create_dataloaders
 
 
 def test_pipeline() -> None:
