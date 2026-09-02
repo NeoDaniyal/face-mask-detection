@@ -1,4 +1,4 @@
-from config import BATCH_SIZE, IDX_TO_CLASS
+from config import Batch_SIZE, IDX_TO_CLASS
 from dataloader import create_dataloaders
 
 
