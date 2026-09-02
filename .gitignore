@@ -12,8 +12,8 @@ env/
 .ipynb_checkpoints/
 
 # Dataset
-data/raw/
-data/processed/
+data/raw/*
+data/processed/*
 
 # Trained models
 models/*.keras
