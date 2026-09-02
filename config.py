@@ -1,7 +1,7 @@
 from pathlib import Path
 
 DRIVE_PROJECT_ROOT = Path(
-    "/content/drive/MyDrive/face_mask_detection/face-mask-detection"
+    "/content/drive/MyDrive/face-mask-detection"
 )
 
 LOCAL_PROJECT_ROOT = Path(__file__).resolve().parent
