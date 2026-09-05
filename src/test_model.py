@@ -10,10 +10,10 @@ def test_model_forward_pass()-> None:
     model.eval()
 
     trainable_params = sum(
-        p.numel() for p in model.parameters() if p.requires_grid
+        p.numel() for p in model.parameters() if p.requires_grad
     )
 
-    with torch.no_grid():
+    with torch.no_grad():
         outputs = model(images)
 
     print("="*60)
