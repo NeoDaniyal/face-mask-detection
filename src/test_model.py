@@ -1,5 +1,5 @@
 import torch
-from dataloaders import create_dataloaders
+from dataloader import create_dataloaders
 from model import MaskCNNBaseline
 
 def test_model_forward_pass()-> None:
