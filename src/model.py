@@ -60,7 +60,7 @@ class MaskCNNBaseline(nn.Module):
 
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(32 * 112 * 112, 128),
+            nn.Linear(32 * 14 * 14, 128),
             nn.ReLU(),
             nn.Dropout(p=dropout_rate),
             nn.Linear(128, 1),
