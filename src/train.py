@@ -129,7 +129,7 @@ def run_training(epoch: int=5, lr: float= 0.001) -> None:
         else:
             saved_str = ""
         print(
-            f"Epoch [{epoch:02d}/{epochs:02d}] ({elapsed:.1f}s) | "
+            f"Epoch [{epoch:02d}/{epoch:02d}] ({elapsed:.1f}s) | "
             f"Train Loss: {train_loss:.4f} - Train Acc: {train_acc * 100:.2f}% | "
             f"Val Loss: {val_loss:.4f} - Val Acc: {val_acc * 100:.2f}% {saved_str}"
         )
