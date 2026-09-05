@@ -32,7 +32,7 @@ def test_model_forward_pass()-> None:
     print("\n3. Sample Output Logits(5 samples):")
     print("-"*60)
     for idx, logits in enumerate(outputs[:5]):
-        print(f"Sample {idx+1}: Raw Logits: {logits.items():.4f}")
+        print(f"Sample {idx+1}: Raw Logits: {logits.item():.4f}")
 
     print("\n4. Forward Pass varification:")
     print("-"*60)
