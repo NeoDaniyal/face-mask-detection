@@ -142,5 +142,5 @@ def run_training(epoch: int=5, lr: float= 0.001) -> None:
 
 
 if __name__ == "__main__":
-    run_training(epochs=5, lr=0.001)
+    run_training(epoch=5, lr=0.001)
 
