@@ -55,8 +55,8 @@ def evaluate_test_set() -> None:
             images = images.to(device)
 
             logits = model(images)
-            probs = torch.sigmoid(logits).sequeeeze(1).cpu().numpy()
-            pred = (logits >= 0.0).sequeeeze(1).cpu().numpy()
+            probs = torch.sigmoid(logits).squeeze(1).cpu().numpy()
+            pred = (logits >= 0.0).squeeze(1).cpu().numpy()
 
             all_targets.extend(labels.numpy())
             all_predictions.extend(pred)
