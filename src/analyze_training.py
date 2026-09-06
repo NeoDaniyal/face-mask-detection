@@ -37,7 +37,7 @@ def plot_training_history()->None:
     plt.figure(figsize=(8,5))
     plt.plot(epochs, train_acc, 'o-', color="#2ca02c", linewidth=2, label="Train Accuracy")
     plt.plot(epochs, val_acc, 'o-', color="#d62728", linewidth=2, label="Val Accuracy")
-    plt.title("Training vs Validation Accuracy (CNN Baseline)", fontsize=12, fondweight="bold")
+    plt.title("Training vs Validation Accuracy (CNN Baseline)", fontsize=12, fontweight="bold")
     plt.xlabel("Epochs", fontsize=10)
     plt.ylabel("Accuracy (%)", fontsize=10)
     plt.xticks(epochs)
