@@ -1,22 +1,13 @@
+import json
 import os
 from pathlib import Path
 import time
 import torch
 import torch.nn as nn
 from torch.optim import Adam
-from config import BATCH_SIZE, MODEL_DIR, RANDOM_SEED
+from config import BATCH_SIZE, MODEL_DIR, OUTPUT_DIR, RANDOM_SEED
 from dataloader import create_dataloaders
 from model import MaskCNNBaseline
-
-
-def calculate_accuracy(logits: torch.Tensor, targets: torch.Tensor) -> float:
-    """Calculates binary classification accuracy.
-
-    Applies sigmoid thresholding at 0.0 logit (0.5 probability).
-    """
-    preds = (logits >= 0.0).float()
-    correct = (preds == targets).sum().item()
-    return correct / targets.size(0)
 
 
 def train_one_epoch(
@@ -34,7 +25,7 @@ def train_one_epoch(
 
     for images, labels in dataloader:
         images = images.to(device)
-        labels = labels.to(device).unsqueeze(1).float()  # Reshape [B] -> [B, 1]
+        labels = labels.to(device).unsqueeze(1).float()
 
         optimizer.zero_grad()
         outputs = model(images)
@@ -94,23 +85,28 @@ def run_training(epochs: int = 5, lr: float = 0.001) -> None:
     print("=" * 60)
     print("STARTING TRAINING PIPELINE")
     print("=" * 60)
-    print(f"Device           : {device}")
-    print(f"Epochs           : {epochs}")
-    print(f"Learning Rate    : {lr}")
-    print(f"Batch Size       : {BATCH_SIZE}")
-    print("-" * 60)
 
-    # Data Loaders
     train_loader, val_loader, _ = create_dataloaders()
 
-    # Model, Loss, Optimizer
     model = MaskCNNBaseline(dropout_rate=0.5).to(device)
     criterion = nn.BCEWithLogitsLoss()
     optimizer = Adam(model.parameters(), lr=lr)
 
     best_val_loss = float("inf")
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    
     best_model_path = MODEL_DIR / "cnn_baseline_best.pth"
+    history_path = OUTPUT_DIR / "history.json"
+
+    # History container
+    history = {
+        "epochs": list(range(1, epochs + 1)),
+        "train_loss": [],
+        "val_loss": [],
+        "train_acc": [],
+        "val_acc": [],
+    }
 
     start_time = time.time()
 
@@ -122,9 +118,14 @@ def run_training(epochs: int = 5, lr: float = 0.001) -> None:
         )
         val_loss, val_acc = evaluate(model, val_loader, criterion, device)
 
+        # Log metrics to history
+        history["train_loss"].append(train_loss)
+        history["val_loss"].append(val_loss)
+        history["train_acc"].append(train_acc)
+        history["val_acc"].append(val_acc)
+
         elapsed = time.time() - epoch_start
 
-        # Checkpoint Best Model
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             torch.save(
@@ -147,10 +148,14 @@ def run_training(epochs: int = 5, lr: float = 0.001) -> None:
             f"Val Loss: {val_loss:.4f} - Val Acc: {val_acc * 100:.2f}% {saved_str}"
         )
 
+    # Save History JSON
+    with open(history_path, "w") as f:
+        json.dump(history, f, indent=4)
+
     total_time = time.time() - start_time
     print("-" * 60)
     print(f"Training Complete in {total_time / 60:.2f} minutes.")
-    print(f"Best Model Checkpoint: {best_model_path.resolve()}")
+    print(f"History Saved to: {history_path.resolve()}")
     print("=" * 60 + "\n")
 
 
