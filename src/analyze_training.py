@@ -21,7 +21,7 @@ def plot_training_history()->None:
     plt.figure(figsize=(8,5))
     plt.plot(epochs, train_loss, 'o-', color="#1f77b4", linewidth=2, label="Train Loss")
     plt.plot(epochs, val_loss, 'o-', color="#ff7f0e", linewidth=2, label="Val Loss")
-    plt.title("Training vs Validation Loss (CNN Baseline)", fontsize=12, fondweight="bold")
+    plt.title("Training vs Validation Loss (CNN Baseline)", fontsize=12, fontweight="bold")
     plt.xlabel("Epochs", fontsize=10)
     plt.ylabel("BCE Loss (%)", fontsize=10)
     plt.xticks(epochs)
