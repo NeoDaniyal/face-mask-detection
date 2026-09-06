@@ -98,7 +98,7 @@ def evaluate_test_set() -> None:
     cm_plot_path = PLOTS_DIR/ "confusion_matrix_baseline.png"
     plt.savefig(cm_plot_path, dpi=300)
     plt.close()
-    print(f"\nSaved Confusion Matrix Plot to: {cm_plot_path.resove()}")
+    print(f"\nSaved Confusion Matrix Plot to: {cm_plot_path.resolve()}")
 
     metrics_data = {
         "test_samples": int(len(all_targets)),
