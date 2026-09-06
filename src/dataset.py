@@ -1,14 +1,4 @@
 from pathlib import Path
-from typing import Callable, Tuple, Optional
-
-from PIL import Image
-import torch
-from torch.utils.data import Dataset
-from torchvision import transforms
-
-from config import CLASS_TO_IDX, IMAGENET_MEAN, IMAGENET_STD, IMAGE_SIZE
-
-from pathlib import Path
 from typing import Callable, Optional, Tuple
 
 from PIL import Image, ImageFile
@@ -18,8 +8,31 @@ from torchvision import transforms
 
 from config import CLASS_TO_IDX, IMAGENET_MEAN, IMAGENET_STD, IMAGE_SIZE
 
-# Allow PIL to load truncated/slightly corrupted images without hanging
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+
+def get_transforms() -> Tuple[transforms.Compose, transforms.Compose]:
+    """Returns training (augmented) and evaluation (deterministic) pipelines."""
+    train_transform = transforms.Compose(
+        [
+            transforms.Resize(IMAGE_SIZE),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomRotation(degrees=15),
+            transforms.ColorJitter(brightness=0.2, contrast=0.2),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
+        ]
+    )
+
+    eval_transform = transforms.Compose(
+        [
+            transforms.Resize(IMAGE_SIZE),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
+        ]
+    )
+
+    return train_transform, eval_transform
 
 
 class MaskDataset(Dataset):
@@ -54,40 +67,13 @@ class MaskDataset(Dataset):
 
         try:
             with Image.open(img_path) as img:
-                # Handle indexed palette images with transparency bytes explicitly
                 if img.mode in ("P", "PA"):
                     img = img.convert("RGBA")
                 image = img.convert("RGB")
         except Exception as e:
-            # Fallback to a blank RGB image if a file is unreadable/corrupt
-            print(f"[⚠️ WARNING] Failed to open image {img_path}: {e}")
             image = Image.new("RGB", IMAGE_SIZE, (0, 0, 0))
 
         if self.transform is not None:
             image = self.transform(image)
 
         return image, label
-
-def get_transform()-> Tuple[transforms.Compose, transforms.Compose]:
-    """Reuturn Training and validation/testing transform pipelines.
-        Uses Resize(256) + CenterCrop(224) to preserve aspected ratio without facial distortion.
-    """
-    train_transform = transforms.Compose(
-        [
-            transforms.Resize(256),
-            transforms.CenterCrop(IMAGE_SIZE),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
-        ]
-    )
-
-    eval_transform = transforms.Compose(
-        [
-            transforms.Resize(256),
-            transforms.CenterCrop(IMAGE_SIZE),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
-        ]
-    )
-
-    return train_transform, eval_transform
