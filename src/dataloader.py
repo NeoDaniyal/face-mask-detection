@@ -2,11 +2,11 @@ from typing import Tuple
 from torch.utils.data import DataLoader
 
 from config import BATCH_SIZE, SPLIT_DATA_DIR
-from src.dataset import MaskDataset, get_transform
+from src.dataset import MaskDataset, get_transforms
 
 def create_dataloaders(split_base_dir=SPLIT_DATA_DIR, batch_size=BATCH_SIZE)-> Tuple[DataLoader,DataLoader, DataLoader]:
     """Instantiate dataset and return Dataloader for train, val and test splits."""
-    train_transform, eval_transform = get_transform()
+    train_transform, eval_transform = get_transforms()
 
     train_dataset = MaskDataset(split_dir=split_base_dir/"train", transform=train_transform)
     val_dataset = MaskDataset(split_dir=split_base_dir/"val", transform=eval_transform)
