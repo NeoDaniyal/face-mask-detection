@@ -97,7 +97,15 @@ def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet1
         raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
-    model.load_state_dict(checkpoint["model_state_dict"])
+
+    if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+        state_dict = checkpoint["model_state_dict"]
+    elif isinstance(checkpoint, dict) and "state_dict" in checkpoint:
+        state_dict = checkpoint["state_dict"]
+    else:
+        state_dict = checkpoint
+
+    model.load_state_dict(state_dict)
     model.eval()
 
     print("=" * 60)
