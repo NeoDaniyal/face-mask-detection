@@ -30,7 +30,7 @@ def run_transfer_training(epoch: int=5, lr: float=1e-4)->None:
 
 
     history = {
-        "epochs": list(range(1, range+1)),
+        "epochs": list(range(1, epoch+1)),
         "train_loss": [],
         "val_loss": [],
         "train_acc": [],
