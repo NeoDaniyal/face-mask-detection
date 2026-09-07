@@ -44,7 +44,7 @@ def run_transfer_training(epoch: int=5, lr: float=1e-4)->None:
         model.train()
         train_loss, train_correct, train_total = 0.0,0,0
         for images, labels in train_loader:
-            images, labels = images.to(device), labels.to(device).unsequeeze(1).float()
+            images, labels = images.to(device), labels.to(device).unsqueeze(1).float()
             optimizer.zero_grad()
             outputs = model(images)
             loss = criterion(outputs, labels)
