@@ -77,11 +77,13 @@ def plot_misclassified_grid(
 def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet18_best.pth") -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # Output setup
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
     misclass_dir = PLOTS_DIR / f"misclassifications_{model_type}"
     misclass_dir.mkdir(parents=True, exist_ok=True)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+    # 1. Load Data & Model Architecture
     _, _, test_loader = create_dataloaders()
 
     if model_type == "resnet18":
@@ -89,17 +91,17 @@ def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet1
     else:
         model = MaskCNNBaseline(dropout_rate=0.5).to(device)
 
-    # Search strategy: prioritize explicit path -> MODEL_DIR -> current directory
-    checkpoint_path = Path(checkpoint_name)
+    # Resolve model path from MODEL_DIR
+    checkpoint_path = MODEL_DIR / checkpoint_name
     if not checkpoint_path.exists():
-        checkpoint_path = MODEL_DIR / checkpoint_name
+        checkpoint_path = Path(checkpoint_name)
 
     if not checkpoint_path.exists():
         raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
 
-    # Safely extract state dict
+    # Extract state dict directly
     if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
         state_dict = checkpoint["model_state_dict"]
     else:
@@ -112,9 +114,10 @@ def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet1
     print(f"TEST EVALUATION & ERROR ANALYSIS: {model_type.upper()}")
     print("=" * 60)
     print(f"Device                   : {device}")
-    print(f"Checkpoint Loaded        : {checkpoint_path.resolve()}")
+    print(f"Checkpoint Loaded        : {checkpoint_path.name}")
     print("-" * 60)
 
+    # 2. Inference Pass
     records = []
     sample_index = 0
 
@@ -145,10 +148,12 @@ def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet1
 
     df_preds = pd.DataFrame(records)
 
+    # Save Prediction CSV
     csv_path = OUTPUT_DIR / f"test_predictions_{model_type}.csv"
     df_preds.drop(columns=["tensor"]).to_csv(csv_path, index=False)
     print(f"Saved Prediction CSV to: {csv_path.resolve()}")
 
+    # 3. Calculate Core Metrics
     all_targets = df_preds["true_label"].values
     all_predictions = df_preds["pred_label"].values
 
@@ -181,6 +186,7 @@ def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet1
     print(f"False Positives (FP) [without_mask → with_mask] : {len(fp_samples)}")
     print("-" * 60)
 
+    # 4. Save Plots & Metrics JSON
     class_labels = [IDX_TO_CLASS[0], IDX_TO_CLASS[1]]
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=class_labels, yticklabels=class_labels, cbar=False)
