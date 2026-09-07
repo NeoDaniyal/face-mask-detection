@@ -64,7 +64,7 @@ def run_transfer_training(epoch: int=5, lr: float=1e-4)->None:
         val_loss, val_correct, val_total = 0.0,0,0
         with torch.no_grad():
             for images, labels in val_loader:
-                images, labels = images.to(device), labels.to(device).unsequeeze(1).float()
+                images, labels = images.to(device), labels.to(device).unsqueeze(1).float()
                 outputs = model(images)
                 loss = criterion(outputs, labels)
 
