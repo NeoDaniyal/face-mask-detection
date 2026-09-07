@@ -24,4 +24,4 @@ class MaskResNet18(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return  self.backbone(x))
+        return  self.backbone(x)
