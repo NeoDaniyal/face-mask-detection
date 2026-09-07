@@ -38,7 +38,7 @@ def run_transfer_training(epoch: int=5, lr: float=1e-4)->None:
     }
     start_time = time.time()
 
-    for epoch in range(1, range+1):
+    for epoch in range(1, epoch+1):
         epoch_start = time.time()
 
         model.train()
