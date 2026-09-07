@@ -114,4 +114,4 @@ def run_transfer_training(epoch: int=5, lr: float=1e-4)->None:
 
 
 if __name__ == "__main__":
-    run_transfer_training(epochs=5, lr=1e-4)
+    run_transfer_training(epoch=5, lr=1e-4)
