@@ -83,25 +83,27 @@ def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet1
     misclass_dir.mkdir(parents=True, exist_ok=True)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # 1. Load Data & Model
+    # 1. Load Data & Model Architecture
     _, _, test_loader = create_dataloaders()
-    
+
     if model_type == "resnet18":
         model = MaskResNet18(dropout_rate=0.3).to(device)
     else:
         model = MaskCNNBaseline(dropout_rate=0.5).to(device)
 
+    # Check MODEL_DIR first, fall back to current directory
     checkpoint_path = MODEL_DIR / checkpoint_name
+    if not checkpoint_path.exists():
+        checkpoint_path = Path(checkpoint_name)
 
     if not checkpoint_path.exists():
         raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
 
+    # Extract state dict safely
     if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
         state_dict = checkpoint["model_state_dict"]
-    elif isinstance(checkpoint, dict) and "state_dict" in checkpoint:
-        state_dict = checkpoint["state_dict"]
     else:
         state_dict = checkpoint
 
@@ -115,7 +117,7 @@ def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet1
     print(f"Checkpoint Loaded        : {checkpoint_path.name}")
     print("-" * 60)
 
-    # 2. Single Inference Pass
+    # 2. Inference Pass
     records = []
     sample_index = 0
 
@@ -128,7 +130,7 @@ def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet1
             for i in range(len(labels)):
                 true_lbl = int(labels[i].item())
                 prob_no_mask = float(probs_without_mask[i].item())
-                
+
                 pred_lbl = 1 if prob_no_mask >= 0.5 else 0
                 is_correct = (pred_lbl == true_lbl)
                 confidence = prob_no_mask if pred_lbl == 1 else (1.0 - prob_no_mask)
@@ -146,12 +148,12 @@ def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet1
 
     df_preds = pd.DataFrame(records)
 
-    # Save metadata table
+    # Save Prediction CSV
     csv_path = OUTPUT_DIR / f"test_predictions_{model_type}.csv"
     df_preds.drop(columns=["tensor"]).to_csv(csv_path, index=False)
     print(f"Saved Prediction CSV to: {csv_path.resolve()}")
 
-    # 3. Metrics Calculation
+    # 3. Calculate Core Metrics
     all_targets = df_preds["true_label"].values
     all_predictions = df_preds["pred_label"].values
 
@@ -184,7 +186,7 @@ def run_evaluation(model_type: str = "resnet18", checkpoint_name: str = "resnet1
     print(f"False Positives (FP) [without_mask → with_mask] : {len(fp_samples)}")
     print("-" * 60)
 
-    # 4. Save Plots & Metrics JSON
+    # 4. Generate & Save Visual Outputs
     class_labels = [IDX_TO_CLASS[0], IDX_TO_CLASS[1]]
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=class_labels, yticklabels=class_labels, cbar=False)
