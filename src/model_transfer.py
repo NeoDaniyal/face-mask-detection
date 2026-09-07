@@ -7,7 +7,7 @@ class MaskResNet18(nn.Module):
     def __init__(self, freeze_backbone: bool =False, dropout_rate: float= 0.3)->None:
         super().__init__()
         weights = ResNet18_Weights.DEFAULT
-        backbone = resnet18(weights=weights)
+        self.backbone = resnet18(weights=weights)
     #Optional: freeze initial convolutional layers for feature extraction
         if freeze_backbone:
             for param in self.backbone.parameters():
