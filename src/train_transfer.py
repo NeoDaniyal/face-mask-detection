@@ -10,7 +10,7 @@ from model_transfer import MaskResNet18
 
 def run_transfer_training(epoch: int=5, lr: float=1e-4)->None:
     torch.manual_seed(RANDOM_SEED)
-    device = torch.device("cude" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     print("="*60)
     print("STARTING RESNET-18 TRANSFER LEARNING PIPELINE")
