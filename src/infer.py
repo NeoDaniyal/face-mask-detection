@@ -8,40 +8,49 @@ from config import IDX_TO_CLASS, MODEL_DIR
 from dataset import get_transforms
 from model_transfer import MaskResNet18
 
-def load_inference_model(check_point_path: Path, device: torch.device) -> torch.nn.Module:
-    """Load trained ResNet-18 model checkpoint for inference."""
+
+def load_inference_model(checkpoint_path: Path, device: torch.device) -> torch.nn.Module:
+    """Loads trained ResNet-18 model checkpoint for inference."""
     model = MaskResNet18(dropout_rate=0.3).to(device)
-    check_point= torch.load(check_point_path, map_location=device)
-    model.load_state_dict(check_point["model_state_dict"])
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+    model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
     return model
 
-def predict_image(image_path: Path, model: torch.nn.Module, device: torch.device, threshold: float=0.19)-> dict:
-    """predicts mask status for a single image tensor using optimized decision threshold."""
-    _,eval_transformer = get_transforms()
+
+def predict_image(
+    image_path: Path,
+    model: torch.nn.Module,
+    device: torch.device,
+    threshold: float = 0.19,
+) -> dict:
+    """Predicts mask status for a single image tensor using optimized decision threshold."""
+    _, eval_transform = get_transforms()
 
     try:
-        # comment: 
         with Image.open(image_path) as img:
-            Image_rgb = img.convert("RGB")
+            image_rgb = img.convert("RGB")
     except Exception as e:
         raise ValueError(f"Could not open image at {image_path}: {e}")
-    # end try
-    tensor = eval_transformer(Image_rgb).unsqueeze(0).to(device)
+
+    tensor = eval_transform(image_rgb).unsqueeze(0).to(device)
+
     with torch.no_grad():
         logits = model(tensor)
         prob_no_mask = torch.sigmoid(logits).squeeze().item()
 
+    # Apply optimal threshold (0.19) derived from threshold analysis
     pred_idx = 1 if prob_no_mask >= threshold else 0
     pred_label = IDX_TO_CLASS[pred_idx]
-    confidence = prob_no_mask if  pred_idx == 1 else (1.0 - prob_no_mask)
+    confidence = prob_no_mask if pred_idx == 1 else (1.0 - prob_no_mask)
 
     return {
         "image_path": str(image_path),
         "predicted_class": pred_label,
         "confidence": float(confidence),
-        "prob_without_mask": float(prob_no_mask)
+        "prob_without_mask": float(prob_no_mask),
     }
+
 
 def main():
     parser = argparse.ArgumentParser(description="Inference CLI for Face Mask Detection")
