@@ -8,7 +8,7 @@ from config import IDX_TO_CLASS, MODEL_DIR
 from dataset import get_transforms
 from model_transfer import MaskResNet18
 
-def load_inference_model(check_point_path: Path, device: torch.device) -> torch.Module:
+def load_inference_model(check_point_path: Path, device: torch.device) -> torch.nn.Module:
     """Load trained ResNet-18 model checkpoint for inference."""
     model = MaskResNet18(dropout_rate=0.3).to(device)
     check_point= torch.load(check_point_path, map_location=device)
